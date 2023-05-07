@@ -34,83 +34,138 @@
             <groupId>com.javarush</groupId>
             <artifactId>desktop-game-engine</artifactId>
             <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/desktop-game-engine.jar</systemPath>
         </dependency>
-        <dependency>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>3.0.0</version>
-        </dependency>
-
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>localrep</id>
-            <name>local repository</name>
-            <url>file:${project.basedir}/lib</url>
-        </repository>
-    </repositories>
-
+<!--    <repositories>-->
+<!--        <repository>-->
+<!--            <id>localrep</id>-->
+<!--            <name>local repository</name>-->
+<!--            <url>file:${project.basedir}/lib</url>-->
+<!--        </repository>-->
+<!--    </repositories>-->
     <build>
+<!--        <resources>-->
+<!--            <resource>-->
+<!--                <directory>.</directory>-->
+<!--                <includes>-->
+<!--                    <include>-->
+<!--                        lib/**/*.jar-->
+<!--                    </include>-->
+<!--                </includes>-->
+<!--            </resource>-->
+<!--        </resources>-->
+        <resources>
+            <resource>
+                <directory>${project.build.directory}/lib</directory>
+                <targetPath>lib</targetPath>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.8</version>
-                <executions>
-                    <!-- копируем библиотеки в ${distrib.directory}/lib -->
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${distrib.directory}/lib</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
-                            <overWriteIfNewer>true</overWriteIfNewer>
-                        </configuration>
-                    </execution>
-                </executions>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>2.4</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.4</version>
                 <configuration>
-                    <outputDirectory>${distrib.directory}</outputDirectory>
+                    <!--                    <outputDirectory>${distrib.directory}</outputDirectory>-->
+                    <!--                    <includes>-->
+                    <!--                        <include>**/lib/desktop-game-engine.jar</include>-->
+                    <!--                    </includes>-->
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
+                            <!--                            <classpathPrefix>lib/</classpathPrefix>-->
                             <mainClass>org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader</mainClass>
-                            <rsrcMainClass>com.javarush.games.racer.RacerGame</rsrcMainClass>
-                            <classPath>desktop-game-engine.jar</classPath>
+                            <classpathPrefix>lib</classpathPrefix>
                         </manifest>
+                        <manifestEntries>
+                            <Rsrc-Main-Class>com.javarush.games.racer.RacerGame</Rsrc-Main-Class>
+                            <Class-Path>./</Class-Path>
+                        </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.surefire</groupId>
-                <artifactId>surefire</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.8</version>
+                <configuration>
+                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+<!--                    <overWriteReleases>false</overWriteReleases>-->
+<!--                    <overWriteSnapshots>false</overWriteSnapshots>-->
+<!--                    <overWriteIfNewer>true</overWriteIfNewer>-->
+                    <includeScope>compile</includeScope>
+                </configuration>
+                <executions>
+                    <execution>
+<!--                        <id>copy-dependencies</id>-->
+<!--                        <phase>validate</phase>-->
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-resources-plugin</artifactId>-->
+<!--                <version>2.7</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>copy-resources</id>-->
+<!--                        <phase>validate</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>copy-resources</goal>-->
+<!--                        </goals>-->
+<!--                        &lt;!&ndash; копируем файлы ресурсов в ${distrib.directory} &ndash;&gt;-->
+<!--                        <configuration>-->
+<!--                            <outputDirectory>${project.basedir}/target/lib</outputDirectory>-->
+<!--                            <resources>-->
+<!--                                <resource>-->
+<!--                                    <directory>${project.basedir}</directory>-->
+<!--                                    <includes>-->
+<!--                                        <include>config.properties</include>-->
+<!--                                    </includes>-->
+<!--                                    <filtering>false</filtering>-->
+<!--                                </resource>-->
+<!--                                <resource>-->
+<!--                                    <directory>${project.basedir}/lib</directory>-->
+<!--                                    <includes>-->
+<!--                                        <include>desktop-game-engine.jar</include>-->
+<!--                                    </includes>-->
+<!--                                    <filtering>false</filtering>-->
+<!--                                </resource>-->
+<!--                            </resources>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0</version>
                 <configuration>
-                    <skipTests>true</skipTests>
-<!--                    <excludes>-->
-<!--                        <exclude>**/StrangeTest.java</exclude>-->
-<!--                        <exclude>/Users/romandiachenko/Documents/Developing/JavaRushInternship/3/MvnPractice/MVNPractice/src/test/java/StrangeTest.java</exclude>-->
-<!--                    </excludes>-->
+<!--                    <skipTests>true</skipTests>-->
+                    <excludes>
+                        <exclude>StrangeTest</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
+
             <!-- Usual compilation -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.10.1</version>
                 <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
